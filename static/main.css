@@ -1,45 +1,79 @@
-body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-        sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+#end_stop_dropdown,
+#start_stop_dropdown {
+  width: 80%;
+  height: 100px;
+  font-size: 50px;
+  display: block;
+  margin: 15px auto auto;
+  background-color: var(--bs-gray);
+}
+#btn_set {
+  display: block;
+  margin-top: 3%;
+  align-items: center;
+  width: 100%;
 }
 
-code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-        monospace;
+#trip {
+  width: 30%;
+  height: 150%;
+  margin-left: 15%;
 }
-
-.App {
-    text-align: center;
+#content {
+  height: 77%;
 }
-
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+#end_spot,
+#start_spot {
+  height: 200px;
 }
+#end_start,
+#input_start {
+  width: 65%;
+  height: 50%;
+  margin-left: 20%;
+  font-size:50px;
 
-.App-header {
-    background-color: #282c34;
-    min-height: 100vh;
+}
+#end_name,
+#start_name {
+  width: 15%;
+}
+#btn_gp {
+  height: 5%;
+}
+#BTN_group {
+  display: block;
+  height: 15%;
+}
+#submit {
+  width: 30%;
+  height: 150%;
+  margin-left: 5%;
+}
+#reset{
+    width: 30%;
+    height: 150%;
+    margin-left: 5%;
+  }
+ 
+  #route-info-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
 }
 
-.App-link {
-    color: #61dafb;
+.time-axis {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-right: 20px; /* 與路程信息的間隔 */
 }
 
-.heart {
-    color: #ff0000;
+.time-axis li {
+    background-color: #4a90e2; /* 藍色背景 */
+    color: white; /* 白色文字 */
+    padding: 5px 10px; /* 內邊距 */
+    margin-bottom: 5px; /* 間隔 */
 }
 
-.small {
-    font-size: 0.75rem;
+.time-axis li:first-child {
+    background-color: #d0021b; /* 第一個時間點使用紅色背景 */
 }
