@@ -1,19 +1,201 @@
-<head>
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
 
-<body>
-    <div class="App">
-        <header class="App-header">
-            <img src="{{ url_for('static', filename='Octocat.png') }}" class="App-logo" alt="logo" />
-            <p>
-                GitHub Codespaces <span class="heart">♥️</span> Flask
-            </p>
-            <p class="small">
-                Edit <code>templates/index.html</code> and refresh to see your changes!
-            </p>
-        </header>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+</head>
+
+<body style="height:2436px; width:1125px">
+    <img id="top" src="{{ url_for('static', filename='top.jpg') }}" width="100%" height="11%">
+    <!-- width="1126" height="250"  -->
+    <div id="content" style="height: 77%;">
+        <div id="start_spot" style="height: 10%;width: 100%;">
+            <h1 id="start_name">開始地點</h1>
+            <input type="text" id="input_start">
+        </div>
+        <div id="end_spot" style="height: 10%;width: 100%;">
+            <h1 id="end_name">結束地點</h1>
+            <input type="text" id="end_start">
+        </div>
+        <div id="btn_gp">
+            <div class="btn-group" role="group" id="BTN_group" style="width: 100%; height:35%">
+                <button class="btn btn-primary" id="reset" type="button">
+                    <h2><strong>重設</strong></h2>
+                </button>
+                <button class="btn btn-primary" id="submit" type="button">
+                    <h2><strong>確定</strong></h2>
+                </button>
+            </div>
+        </div>
+        <iframe id="map" allowfullscreen="" frameborder="0" width="100%" height="400"></iframe>
+        <div id="route-info-container">
+            <div class="loader" style="display: none;"></div>
+
+            <!-- 時間軸列表 -->
+            <ul class="time-axis">
+                <!-- 動態生成的時間點 -->
+            </ul>
+            <div id="route-info" style="display: none;"></div>
+            <div style="display: none;">
+                <div id="icon-walk" data-src="{{ url_for('static', filename='walk.png') }}"></div>
+                <div id="icon-bike" data-src="{{ url_for('static', filename='bike.png') }}"></div>
+                <div id="icon-bus" data-src="{{ url_for('static', filename='bus.png') }}"></div>
+                <div id="icon-mrt" data-src="{{ url_for('static', filename='MRT.png') }}"></div>
+            </div>
+        </div>
+
     </div>
+    <img id="botton" src="{{ url_for('static', filename='botton.png') }}" width="100%" height="12%">
+
+    <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+
+    <script>
+        
+        document.getElementById('submit').addEventListener('click', function () {
+            var startInput = document.getElementById('input_start');
+            var endInput = document.getElementById('end_start');
+            var start = startInput.value;
+            var end = endInput.value;
+
+            var formData = new FormData();
+            formData.append('start', start);
+            formData.append('end', end);
+            document.getElementById('route-info').innerHTML = '';
+            document.getElementById('route-info').style.display = 'none';
+            var timeAxis = document.querySelector('.time-axis');
+            timeAxis.innerHTML = '';
+            timeAxis.style.display = 'none';
+
+            // 显示loading动画
+            document.querySelector('.loader').style.display = 'block';
+
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    document.querySelector('.loader').style.display = 'none';
+
+                    if (data && data.length > 0 && data[0][0] === '無法規劃行程') {
+                        document.getElementById('route-info').innerHTML = '無法規劃行程';
+                        document.getElementById('route-info').style.display = 'block';
+                    } else {
+                        // 清空route-info中的内容
+                        document.getElementById('route-info').innerHTML = '';
+
+                        data.forEach(function (route) {
+                            // Inside the data.forEach loop where you generate the route information items
+                            var routeInfoItem = document.createElement('div');
+                            routeInfoItem.classList.add('route-info-item');
+
+                            // Create a container for the route text and YouBike information
+                            var routeTextContainer = document.createElement('div');
+                            routeTextContainer.classList.add('route-text-container');
+
+                            var icon = document.createElement('img');
+                            icon.src = getTransportIcon(route[0]);
+                            icon.alt = route[0];
+                            icon.classList.add('route-icon');
+                            routeInfoItem.appendChild(icon); // Add icon to the main route info item
+
+                            var routeText = document.createElement('span');
+                            routeText.textContent = `${route[1]} 到 ${route[2]}`;
+                            routeTextContainer.appendChild(routeText);
+
+                            // Check if there are YouBike station details
+                            if (route.length > 4) {
+                                var youBikeInfo = document.createElement('div');
+                                youBikeInfo.textContent = `${route[4]}, ${route[5]}`;
+                                youBikeInfo.classList.add('youbike-info');
+                                routeTextContainer.appendChild(youBikeInfo); // Add YouBike info beneath the route text
+                            }
+
+                            routeInfoItem.appendChild(routeTextContainer); // Add the text container to the main route info item
+                            document.getElementById('route-info').appendChild(routeInfoItem);
+                        });
+                        document.getElementById('route-info').style.display = 'block';
+
+                        generateTimeAxis(data);
+                    }
+                })
+                .catch(function (error) {
+                    console.error('Error:', error);
+                });
+        });
+
+
+
+        function getTransportIcon(transportMode) {
+            if (transportMode.startsWith('步行')) {
+                return document.getElementById('icon-walk').getAttribute('data-src');
+            } else if (transportMode.startsWith('共享單車')) {
+                return document.getElementById('icon-bike').getAttribute('data-src');
+            } else if (transportMode.startsWith('公車')) {
+                return document.getElementById('icon-bus').getAttribute('data-src');
+            } else if (transportMode.startsWith('捷運') || transportMode.startsWith('站內步行')) {
+                return document.getElementById('icon-mrt').getAttribute('data-src');
+            }
+            // 添加更多交通工具的匹配規則
+            return ''; // 默認圖標或返回空
+        }
+
+        function makeRequest() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyDK-gLmJoNajpyojL1TmOe6_Hub1iomzbc');
+            xhr.onload = function () {
+                var response = JSON.parse(this.responseText);
+                console.log(response);
+                var location = response.location;
+                var mapIframe = document.getElementById('map');
+                var mapSrc = `https://www.google.com/maps/embed/v1/place?key=AIzaSyDK-gLmJoNajpyojL1TmOe6_Hub1iomzbc&q=${location.lat},${location.lng}&zoom=15`;
+                mapIframe.src = mapSrc;
+            }
+            xhr.send();
+        }
+        function generateTimeAxis(routeData) {
+            var timeAxis = document.querySelector('.time-axis');
+            timeAxis.innerHTML = '';
+
+            var currentTime = new Date();
+
+            routeData.forEach(function (route, index) {
+
+                var durationSeconds = parseInt(route[3], 10);
+
+                if (index === 0) {
+                    timeAxis.innerHTML += `<li>${formatTime(currentTime)}</li>`;
+                }
+
+                currentTime = new Date(currentTime.getTime() + durationSeconds * 1000);
+                if (index < routeData.length - 1) {
+                    timeAxis.innerHTML += `<li>${formatTime(currentTime)}</li>`;
+                }
+            });
+
+            timeAxis.style.display = 'block';
+        }
+
+        function formatTime(date) {
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            return `${padZero(hours)}:${padZero(minutes)}`;
+        }
+
+        function padZero(num) {
+            return num < 10 ? '0' + num : num.toString();
+        }
+        window.onload = function () {
+            makeRequest();
+        };
+    </script>
+
 </body>
 
 </html>
