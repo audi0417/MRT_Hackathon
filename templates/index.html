@@ -9,52 +9,70 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
 </head>
 
-<body style="height:2436px; width:1125px">
-    <img id="top" src="{{ url_for('static', filename='top.jpg') }}" width="100%" height="11%">
-    <!-- width="1126" height="250"  -->
-    <div id="content" style="height: 77%;">
-        <div id="start_spot" style="height: 10%;width: 100%;">
-            <h1 id="start_name">開始地點</h1>
-            <input type="text" id="input_start">
+<body>
+    <div class="px">
+        <div class="px__body">
+            <div class="px__body__cut"></div>
+            <div class="px__body__speaker"></div>
+            <div class="px__body__camera"></div>
+            <div class="px__body__sensor"></div>
+            <div class="px__body__mute"></div>
+            <div class="px__body__up"></div>
+            <div class="px__body__down"></div>
+            <div class="px__body__right"></div>
         </div>
-        <div id="end_spot" style="height: 10%;width: 100%;">
-            <h1 id="end_name">結束地點</h1>
-            <input type="text" id="end_start">
-        </div>
-        <div id="btn_gp">
-            <div class="btn-group" role="group" id="BTN_group" style="width: 100%; height:35%">
-                <button class="btn btn-primary" id="reset" type="button">
-                    <h2><strong>重設</strong></h2>
-                </button>
-                <button class="btn btn-primary" id="submit" type="button">
-                    <h2><strong>確定</strong></h2>
-                </button>
+        <div class="px__screen">
+            <div class="px__screen__">
+                <div class="px__screen__frame">
+                    <div class="fixed-top">
+                        <img id="top" src="{{ url_for('static', filename='top.jpg') }}" class="img-fluid">
+                    </div>
+                    <!-- width="1126" height="250"  -->
+                    <div id="content" class="overflow-auto">
+                        <div id="start_spot">
+                            <h6 id="start_name">開始地點</h6>
+                            <input type="text" id="input_start" class="form-control">
+                        </div>
+                        <div id="end_spot">
+                            <h6 id="end_name">結束地點</h6>
+                            <input type="text" id="end_start" class="form-control">
+                        </div>
+                        <div id="btn_gp" class="btn-group d-flex justify-content-center" role="group">
+                            <button class="btn btn-primary" id="reset" type="button">
+                                <h6><strong>重設</strong></h6>
+                            </button>
+                            <button class="btn btn-primary" id="submit" type="button">
+                                <h6><strong>確定</strong></h6>
+                            </button>
+                        </div>
+                        <iframe id="map" allowfullscreen="" frameborder="0"></iframe>
+                        <div id="route-info-container">
+                            <div class="loader" style="display: none;"></div>
+
+                            <!-- 時間軸列表 -->
+                            <ul class="time-axis">
+                                <!-- 動態生成的時間點 -->
+                            </ul>
+                            <div id="route-info" style="display: none;"></div>
+                            <div style="display: none;">
+                                <div id="icon-walk" data-src="{{ url_for('static', filename='walk.png') }}"></div>
+                                <div id="icon-bike" data-src="{{ url_for('static', filename='bike.png') }}"></div>
+                                <div id="icon-bus" data-src="{{ url_for('static', filename='bus.png') }}"></div>
+                                <div id="icon-mrt" data-src="{{ url_for('static', filename='MRT.png') }}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <iframe id="map" allowfullscreen="" frameborder="0" width="100%" height="400"></iframe>
-        <div id="route-info-container">
-            <div class="loader" style="display: none;"></div>
-
-            <!-- 時間軸列表 -->
-            <ul class="time-axis">
-                <!-- 動態生成的時間點 -->
-            </ul>
-            <div id="route-info" style="display: none;"></div>
-            <div style="display: none;">
-                <div id="icon-walk" data-src="{{ url_for('static', filename='walk.png') }}"></div>
-                <div id="icon-bike" data-src="{{ url_for('static', filename='bike.png') }}"></div>
-                <div id="icon-bus" data-src="{{ url_for('static', filename='bus.png') }}"></div>
-                <div id="icon-mrt" data-src="{{ url_for('static', filename='MRT.png') }}"></div>
-            </div>
+        <div class="fixed-bottom">
+            <img id="botton" src="{{ url_for('static', filename='botton.png') }}" class="img-fluid">
         </div>
-
     </div>
-    <img id="botton" src="{{ url_for('static', filename='botton.png') }}" width="100%" height="12%">
-
     <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
 
     <script>
-        
+
         document.getElementById('submit').addEventListener('click', function () {
             var startInput = document.getElementById('input_start');
             var endInput = document.getElementById('end_start');
