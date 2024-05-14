@@ -7,8 +7,9 @@ from functools import lru_cache
 
 app = Flask(__name__)
 
-CLIENT_ID = 't112ab8033-b77dbe3d-6d9c-41c8'
-CLIENT_SECRET = 'da595af2-d0bd-4e68-ac6f-4098fb030168'
+# TDX ID與金鑰
+CLIENT_ID = <YOUR ID>
+CLIENT_SECRET = <YOUR SECRET>
 
 @app.route("/")
 def hello_world():
@@ -59,7 +60,7 @@ def parse_travel_info(json_data, start, end):
     result = []
     route = json_data[min_route_index]
     sections = route['sections']
-    last_valid_place = start  # 初始值为起点
+    last_valid_place = start  
 
     for i, section in enumerate(sections):
         transport_mode = get_transport_mode(section)
@@ -67,20 +68,19 @@ def parse_travel_info(json_data, start, end):
         start_point = section.get('departure', {}).get('place', {}).get('name', last_valid_place)
         end_point = section.get('arrival', {}).get('place', {}).get('name', None)
         
-        # 如果当前行程没有有效的终点信息，查找下一个包含有效起点信息的行程作为当前行程的终点
         if not end_point:
             for next_section in sections[i+1:]:
                 next_start_point = next_section.get('departure', {}).get('place', {}).get('name', None)
                 if next_start_point:
                     end_point = next_start_point
                     break
-            # 如果后续没有找到有效的起点，使用用户输入的终点作为当前行程的终点
+            
             if not end_point:
                 end_point = end
 
         duration = section.get('travelSummary', {}).get('duration', "0")
 
-        last_valid_place = end_point  # 更新最后一个有效地点
+        last_valid_place = end_point  
 
         route_result = [transport_mode, start_point, end_point, str(duration)]
         result.append(route_result)
