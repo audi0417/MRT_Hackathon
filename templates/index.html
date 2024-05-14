@@ -65,14 +65,12 @@
             formData.append('start', start);
             formData.append('end', end);
 
-            // 清除旧的路程信息和时间轴
             document.getElementById('route-info').innerHTML = '';
             document.getElementById('route-info').style.display = 'none';
             var timeAxis = document.querySelector('.time-axis');
             timeAxis.innerHTML = '';
             timeAxis.style.display = 'none';
 
-            // 显示LOADING字样
             document.getElementById('loading').style.display = 'block';
 
             fetch('/', {
@@ -88,13 +86,11 @@
                     var routeInfo = '';
                     data.forEach(function (route) {
                         var transportIcon = getTransportIcon(route[0]);
-                        // 不显示每段行程的耗时
                         routeInfo += `<img src="${transportIcon}" alt="${route[0]}" style="width:24px; height:24px;"> ${route.slice(0, -1).join(' - ')}<br>`;
                     });
                     document.getElementById('route-info').innerHTML = routeInfo;
                     document.getElementById('route-info').style.display = 'block';
 
-                    // 生成并显示时间轴，传入原始数据 data
                     generateTimeAxis(data);
                 })
                 .catch(function (error) {
@@ -113,13 +109,12 @@
             } else if (transportMode.startsWith('捷運') || transportMode.startsWith('站內步行')) {
                 return document.getElementById('icon-mrt').getAttribute('data-src');
             }
-            // 添加更多交通工具的匹配規則
-            return ''; // 默認圖標或返回空
+            return ''; 
         }
 
         function makeRequest() {
             var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyDK-gLmJoNajpyojL1TmOe6_Hub1iomzbc');
+            xhr.open('POST', 'https://www.googleapis.com/geolocation/v1/geolocate?key=<Google API>');
             xhr.onload = function () {
                 var response = JSON.parse(this.responseText);
                 console.log(response);
@@ -132,42 +127,28 @@
         }
         function generateTimeAxis(routeData) {
             var timeAxis = document.querySelector('.time-axis');
-            timeAxis.innerHTML = ''; // 清空现有的时间轴
-
-            // 获取当前时间作为起始时间点
+            timeAxis.innerHTML = '';
             var currentTime = new Date();
-
-            // 遍历每个行程，计算并显示每个行程的开始时间
             routeData.forEach(function (route, index) {
-                // 获取该行程的秒数
                 var durationSeconds = parseInt(route[3], 10);
-
-                // 如果是第一个行程，直接使用当前时间
                 if (index === 0) {
                     timeAxis.innerHTML += `<li>${formatTime(currentTime)}</li>`;
                 }
-
-                // 计算下一个行程的开始时间
                 currentTime = new Date(currentTime.getTime() + durationSeconds * 1000);
-
-                // 如果不是最后一个行程，显示下一个行程的开始时间
                 if (index < routeData.length - 1) {
                     timeAxis.innerHTML += `<li>${formatTime(currentTime)}</li>`;
                 }
             });
 
-            // 显示时间轴
             timeAxis.style.display = 'block';
         }
 
-        // 格式化时间为 HH:MM 的格式
         function formatTime(date) {
             var hours = date.getHours();
             var minutes = date.getMinutes();
             return `${padZero(hours)}:${padZero(minutes)}`;
         }
 
-        // 如果数字小于10，前面补零
         function padZero(num) {
             return num < 10 ? '0' + num : num.toString();
         }
